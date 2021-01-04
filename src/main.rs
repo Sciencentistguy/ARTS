@@ -11,6 +11,14 @@ fn main() {
     println!("{:?}", tasks);
 
     l_and_l_utilisation(&tasks);
+
+    println!("");
+
+    let response_times: Vec<_> = tasks.iter().map(|task| (task, response_time(&task, &tasks))).collect();
+    println!(
+        "These tasks {} schedulable according to respose-time analysis",
+        if response_times.iter().any(|(task, r)| r < &(task.D as f64)){ "are" } else { "may not be" }
+    );
 }
 
 fn l_and_l_utilisation(tasks: &[Task]) -> bool {
@@ -24,6 +32,31 @@ fn l_and_l_utilisation(tasks: &[Task]) -> bool {
         if schedulable { "are" } else { "may not be" }
     );
     schedulable
+}
+
+fn response_time(i: &Task, tasks: &[Task]) -> f64 {
+    let tasks_with_higher_p: Vec<_> = tasks.iter().filter(|task| task.P > i.P).collect();
+
+    let mut w = -1.0;
+    let mut w_last = i.C as f64;
+
+    while w != w_last {
+        w_last = w;
+        let sum: f64 = tasks_with_higher_p
+            .iter()
+            .map(|task| (w_last / task.T as f64).ceil() * task.C as f64)
+            .sum();
+        w = i.C as f64 + sum;
+    }
+    println!(
+        "The response time for task {} is {}. The deadline is {}.{}",
+        i.name,
+        w,
+        i.D,
+        if w > i.D as f64 { " \x1b[31mThis in invalid!\x1b[0m" } else { "" }
+    );
+
+    w
 }
 
 fn parse_input<P: AsRef<Path>>(path: P, implicit_deadlines: bool) -> Vec<Task> {
