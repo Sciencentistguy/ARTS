@@ -29,7 +29,7 @@ fn l_and_l_utilisation(tasks: &[Task]) -> bool {
     println!("U: {}; Limit: {}", sum, limit);
     println!(
         "These tasks {} schedulable according to the L&L Utilisation-based test.",
-        if schedulable { "are" } else { "may not be" }
+        if schedulable { "are" } else { "are not" }
     );
     schedulable
 }
